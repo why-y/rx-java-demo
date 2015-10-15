@@ -1,7 +1,9 @@
 package ch.bbv.java.rx.example;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -11,6 +13,10 @@ import org.junit.Test;
 
 import ch.bbv.java.rx.example.model.Employee;
 import ch.bbv.java.rx.example.model.Employee.Skill;
+import rx.Observable;
+import rx.Subscriber;
+import rx.observers.Subscribers;
+import rx.observers.TestObserver;
 
 /**
  * @author yvesgross
@@ -18,7 +24,17 @@ import ch.bbv.java.rx.example.model.Employee.Skill;
  */
 public class BasicsTest {
 	
+	private static final List<Employee> TEST_DATA = Arrays.asList(
+			new Employee(100L, "Eric Smith", Arrays.asList(Skill.DOTNET, Skill.SCRUM)),
+			new Employee(101L, "Mary Miller", Arrays.asList(Skill.JAVA, Skill.SCRUM, Skill.RX)),
+			new Employee(102L, "Tom Kenneth", Arrays.asList(Skill.EMBEDDED)),
+			new Employee(103L, "Jane Smith", Arrays.asList(Skill.DOTNET, Skill.EMBEDDED)),
+			new Employee(104L, "Ben Richards", Arrays.asList(Skill.DOTNET, Skill.JAVA, Skill.SCRUM, Skill.RX))
+			);
+	
 	Basics api;
+	
+	TestObserver<Employee> testObserver = new TestObserver<>();
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -31,6 +47,7 @@ public class BasicsTest {
 	@Before
 	public void setUp() throws Exception {
 		api = new Basics();
+		TEST_DATA.stream().forEach(e -> api.create(e));
 	}
 
 	@After
@@ -38,43 +55,37 @@ public class BasicsTest {
 	}
 
 	@Test
-	public void test() {
-		// TODO: create an 'Observable' that 'return's an integer
-//		Observable<Integer> observable = Observable.<Integer>empty();
-		
-		
-//        var observer = new TestSink<int>();
-		
-		//// TODO: subscribe to the observable
-		
-//        observer.Values.Single().Should().Be(42);		
-	}
-
-	@Test
 	public void testGetAll() {
 		
 		// Classic
-		Collection<Employee> employees = api.getAll();
-		printIt(employees);
+		api.getAll().stream().forEach(BasicsTest::printIt);;
 
 		// Rx
-		api.rxGetAll().forEach(BasicsTest::printIt);
+		api.rxGetAll().subscribe(testObserver);
+
+		// verify
+		testObserver.assertReceivedOnNext(TEST_DATA);
+		testObserver.assertTerminalEvent();
+		printIt(testObserver.getOnNextEvents());
+
 	}
 
 	@Test
-	public void testGetOne() {
+	public void testGet() {
 
-		long theId = 102L;
+		int index = 2;
+		long existingId = TEST_DATA.get(index).getId();
 		
 		// Classic
-		Employee employee = api.getById(theId);
-		printIt(employee);
+		printIt(api.getById(existingId));
 		
 		// Rx
-		api.rxGetById(theId).subscribe(
-				result -> printIt(result),
-				exc -> exc.printStackTrace(),
-				() -> printIt("Compeleted:"));
+		api.rxGetById(existingId).subscribe(testObserver);
+
+		// verify
+		testObserver.assertReceivedOnNext(Arrays.asList(TEST_DATA.get(index)));
+		testObserver.assertTerminalEvent();
+		assertTrue(testObserver.getOnErrorEvents().isEmpty());
 
 	}
 
@@ -82,17 +93,15 @@ public class BasicsTest {
 	public void testGetJavaEmloyees() {
 		
 		// Classic
-		Collection<Employee> all = api.getAll();
-		Collection<Employee> result = new ArrayList<>();
-		for (Employee employee : all) {
-			if(employee.getSkills().contains(Skill.JAVA)) {
-				result.add(employee);
-			}
-		}
-		printIt(result);
+		api.getBySkill(Skill.JAVA).stream().forEach(BasicsTest::printIt);
 		
 		// Rx
-		api.rxGetBySkill(Skill.JAVA).forEach(BasicsTest::printIt);
+		api.rxGetBySkill(Skill.JAVA).subscribe(testObserver);
+		
+		// verify
+		testObserver.assertReceivedOnNext(Arrays.asList(TEST_DATA.get(1), TEST_DATA.get(4)));
+		testObserver.assertTerminalEvent();	
+		assertTrue(testObserver.getOnErrorEvents().isEmpty());
 		
 	}
 
