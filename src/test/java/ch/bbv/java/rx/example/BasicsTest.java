@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ch.bbv.java.rx.example.model.Employee;
 import rx.Observable;
 import rx.observers.TestObserver;
 import rx.subjects.PublishSubject;
@@ -26,8 +25,6 @@ public class BasicsTest {
 	
 	private static boolean errorHappened = false;
 	
-	TestObserver<Employee> testObserver = new TestObserver<>();
-
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
