@@ -1,9 +1,7 @@
 package ch.bbv.java.rx.example;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import ch.bbv.java.rx.example.model.Employee;
@@ -18,8 +16,11 @@ public class Basics {
 	 * @return
 	 */
 	public Observable<Employee> rxGetAll() {
+		
 		return Observable.empty();
+		
 //		return Observable.from(employeeDb);
+		
 	}
 	
 	/**
@@ -37,9 +38,19 @@ public class Basics {
 	 * @return
 	 */
 	public Observable<Employee> rxGetBySkill(Skill skill) {
+		
 		return Observable.empty();
+		
 //		return rxGetAll()
 //				.filter(e -> e.getSkills().contains(skill))	;
+		
+//		// ... or, getting it the classic way, and emit the
+//		// values through a "Subject"
+//		List<Employee> employeesSkilledWith = getBySkill(skill);
+//		ReplaySubject<Employee> subject = ReplaySubject.create();
+//		employeesSkilledWith.stream().forEach(e -> subject.onNext(e));
+//		subject.onCompleted();
+//		return subject;
 	}
 
 	

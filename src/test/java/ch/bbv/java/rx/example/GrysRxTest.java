@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,6 +25,7 @@ import org.junit.Test;
 
 import rx.Observable;
 import rx.Observer;
+import rx.Scheduler;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 
@@ -34,7 +36,7 @@ import rx.schedulers.Schedulers;
 public class GrysRxTest {
 	
     private static final Logger logger = Logger.getLogger(GrysRxTest.class.getName());
-    private static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss.SSS");
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("mm:ss.SSS");
 
 	private SimpleRx toTest;
 	
@@ -195,6 +197,30 @@ public class GrysRxTest {
 		// or:
 		toTest.getElementsRx().forEach(System.out::println);
 		
+	}
+	
+	@Test
+	public void testGetABC() {
+		long start = System.currentTimeMillis();
+		System.out.println("--\\ testGetABC()");
+		CountDownLatch cdl = new CountDownLatch(1);
+		toTest.getABC()
+			.onBackpressureBuffer()
+			.subscribeOn(Schedulers.computation())
+			.observeOn(Schedulers.immediate())
+			.subscribe(
+				s -> System.out.println(String.format("getABC() returned: %s", s)),
+				e -> e.printStackTrace(),
+				() -> {
+					System.out.println("getABC() completed!"); 
+					cdl.countDown();});
+		try {
+			cdl.await();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		long duration = System.currentTimeMillis()-start;
+		System.out.println(String.format("--/ testGetABC()  duration: %s(%d)", SDF.format(new Date(duration)), duration));
 	}
 
 }
