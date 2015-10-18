@@ -25,7 +25,6 @@ import org.junit.Test;
 
 import rx.Observable;
 import rx.Observer;
-import rx.Scheduler;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 

@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.junit.After;
@@ -18,7 +19,10 @@ import org.junit.Test;
 
 import ch.bbv.java.rx.example.model.Employee;
 import ch.bbv.java.rx.example.model.Employee.Skill;
+import rx.Observable;
+import rx.Scheduler.Worker;
 import rx.observers.TestObserver;
+import rx.schedulers.TestScheduler;
 
 /**
  * @author yvesgross
@@ -110,7 +114,6 @@ public class ModelServiceTest {
 		assertTrue(testObserver.getOnErrorEvents().isEmpty());
 		
 	}
-
 	
 	/**
 	 * Prints the given object to standard out by also
