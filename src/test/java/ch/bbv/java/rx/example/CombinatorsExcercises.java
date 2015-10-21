@@ -139,29 +139,8 @@ public class CombinatorsExcercises {
 	@Test
 	public void exerciseDebounce() throws InterruptedException {
 
-		CountDownLatch cdl = new CountDownLatch(1);
-		
-		List<Integer> result = new ArrayList<>();
-		Observer<Integer> testObserver = new Observer<Integer>() {
-
-			@Override
-			public void onCompleted() {
-				cdl.countDown();
-			}
-
-			@Override
-			public void onError(Throwable e) {
-				e.printStackTrace();
-			}
-
-			@Override
-			public void onNext(Integer t) {
-				result.add(t);
-			}
-		};
 				
 		PublishSubject<Integer> input = PublishSubject.create();
-		
 		
 		// TODO: ignore input elements preceeding another in less than or equal 100 ticks
 		// HINT 1: http://reactivex.io/documentation/operators/debounce.html
@@ -172,7 +151,11 @@ public class CombinatorsExcercises {
 		Observable<Integer> observable = input.debounce(110, TimeUnit.MILLISECONDS);
 		////////////////////////////////////////////////////////////////////////
 
-		observable.subscribe(testObserver);
+		CountDownLatch cdl = new CountDownLatch(1);
+		List<Integer> result = new ArrayList<>();
+		observable.subscribe(result::add, 
+				e -> e.printStackTrace(),
+				() -> cdl.countDown());
 		
 		// start test sequence
 		input.onNext(1);
@@ -225,30 +208,7 @@ public class CombinatorsExcercises {
 	@Test
 	public void exerciseBatching() throws InterruptedException {
 		
-		CountDownLatch cdl = new CountDownLatch(1);
-		
-		List<List<String>> result = new ArrayList<>();
-		
-		Observer<List<String>> testObserver = new Observer<List<String>>() {
-			
-			@Override
-			public void onCompleted() {
-				cdl.countDown();
-			}
-			
-			@Override
-			public void onError(Throwable e) {
-				e.printStackTrace();
-			}
-			
-			@Override
-			public void onNext(List<String> t) {
-				result.add(t);
-			}
-		};
-		
 		PublishSubject<String> input = PublishSubject.create();
-		
 		
         // - The cable car leaves: 
         //   a) when there are 2 persons in the car
@@ -264,7 +224,12 @@ public class CombinatorsExcercises {
 		Observable<List<String>> observable = input.buffer(120, TimeUnit.MILLISECONDS, 2).filter(l -> !l.isEmpty());
 		////////////////////////////////////////////////////////////////////////
 		
-		observable.subscribe(testObserver);
+		CountDownLatch cdl = new CountDownLatch(1);
+		List<List<String>> result = new ArrayList<>();
+		observable.subscribe(
+				result::add,
+				e -> e.printStackTrace(),
+				() -> cdl.countDown());
 		
 		// start test sequence
 		Thread.sleep(300);
