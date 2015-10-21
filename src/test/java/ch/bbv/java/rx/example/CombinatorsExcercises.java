@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -17,10 +19,9 @@ import rx.subjects.PublishSubject;
 
 /**
  * @author yvesgross
- * @param <T>
  *
  */
-public class CombinatorsExcercises<T> {
+public class CombinatorsExcercises {
 
 	@Test
     public void exerciseFiltering()
@@ -190,14 +191,148 @@ public class CombinatorsExcercises<T> {
 
 	}
 
+	@Test
+	public void exerciseChangesOnly() {
+		
+		List<Integer> input = Arrays.asList(20, 20, 21, 22, 22, 21, 24, 24, 24, 23);
+		
+        // As with records from a database, we might only be interested in distinct notifications.
+        // For reactive streams, having strictly distinct values implies waiting for completion and
+        // caching all intermediate results. A more common use case is to only let through values that
+        // changed relatively to the previous one.
+        // TODO: only return changed temperature values (includes the first, new one)
+        // HINT: http://reactivex.io/documentation/operators/distinct.html (almost)
+		
+		//////////////////// UNRESOVED /////////////////////////////////////////
+//		Observable<Integer> observable = Observable.empty();
+		//////////////////// RESOLVED //////////////////////////////////////////
+		Observable<Integer> observable = Observable.from(input).distinctUntilChanged();
+		////////////////////////////////////////////////////////////////////////
+		
+
+		// verify
+		List<Integer> expected = Arrays.asList(20, 21, 22, 21, 24, 23);
+		TestObserver<Integer> testObserver = new TestObserver<>();
+		observable.subscribe(testObserver);
+		testObserver.getOnErrorEvents().isEmpty();
+		testObserver.assertTerminalEvent();
+		testObserver.assertReceivedOnNext(expected);
+		
+	}
+
+	
+	
+	@Test
+	public void exerciseBatching() throws InterruptedException {
+		
+		CountDownLatch cdl = new CountDownLatch(1);
+		
+		List<List<String>> result = new ArrayList<>();
+		
+		Observer<List<String>> testObserver = new Observer<List<String>>() {
+			
+			@Override
+			public void onCompleted() {
+				cdl.countDown();
+			}
+			
+			@Override
+			public void onError(Throwable e) {
+				e.printStackTrace();
+			}
+			
+			@Override
+			public void onNext(List<String> t) {
+				result.add(t);
+			}
+		};
+		
+		PublishSubject<String> input = PublishSubject.create();
+		
+		
+        // - The cable car leaves: 
+        //   a) when there are 2 persons in the car
+        //   b) when 120 ticks passed
+        // - The cable car should only leave, when tourists are present
+        // TODO: Split the tourists into suitable batches
+        // HINT 1: http://reactivex.io/documentation/operators/buffer.html (suitable overload)
+        // HINT 2: filtering
+		
+		//////////////////// UNRESOVED /////////////////////////////////////////
+//		Observable<List<String>> observable = input.empty();
+		//////////////////// RESOLVED //////////////////////////////////////////
+		Observable<List<String>> observable = input.buffer(120, TimeUnit.MILLISECONDS, 2).filter(l -> !l.isEmpty());
+		////////////////////////////////////////////////////////////////////////
+		
+		observable.subscribe(testObserver);
+		
+		// start test sequence
+		Thread.sleep(300);
+		input.onNext("Alice");
+		Thread.sleep(130);
+		input.onNext("Bob");
+		Thread.sleep(51);
+		input.onNext("Carol");
+		Thread.sleep(20);
+		input.onNext("Dave");
+		Thread.sleep(4);
+		input.onNext("Eric");
+		input.onNext("Floyd");
+		input.onCompleted();
+		
+		// wait for completion
+		cdl.await();
+		
+		assertEquals(Arrays.asList(
+				Arrays.asList("Alice"),
+				Arrays.asList("Bob"),
+				Arrays.asList("Carol", "Dave"),
+				Arrays.asList("Eric", "Floyd")), 
+				result);
+		
+	}
 		
 	@Test
-	public void test1() {
+	public void exerciseMovingAverage() {
+
+		// TODO: calculate the moving (every second) average (over one minute) of the temperature readings.
+        // HINT: use a suitable overload of the same method used in "Batching"
+        // and then calculate the average of each batch using LINQ
+        // HINT: don't forget to pass the scheduler
+
+		//////////// ?????????????????????????????
+		//////////////////// UNRESOVED /////////////////////////////////////////
+		//////////////////// RESOLVED //////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////
+
+		// verify
+		
+	}
+	
+	@Test
+	public void exerciseInterruptible() {
+        
+		// For a news site offering articles about trending topics we want to keep reading about
+        // a topic until a new trend appears, when we want to hear about the latest news there.
+        // For the sake of simplicity, we assume fixed rates for topics and articles:
+
+		Map<String, List<String>> articlesInTopic = new HashMap<>();
+		articlesInTopic.put("Topic A", Arrays.asList("Article 000","Article 002","Article 003"));
+		articlesInTopic.put("Topic B", Arrays.asList("Article 100","Article 102","Article 103"));
+		articlesInTopic.put("Topic C", Arrays.asList("Article 400","Article 402","Article 403"));
+		
+//		articlesInTopics = Observable.interval(100, TimeUnit.MILLISECONDS)
+		
+		
+		
+        // TODO: always switch to the latest topic
+        // HINT: http://reactivex.io/documentation/operators/switch.html
+
+		
 		
 		//////////////////// UNRESOVED /////////////////////////////////////////
 		//////////////////// RESOLVED //////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////
-		
 
 		// verify
 		
