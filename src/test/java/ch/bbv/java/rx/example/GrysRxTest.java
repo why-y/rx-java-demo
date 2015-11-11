@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.print.attribute.standard.PrinterLocation;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -195,6 +197,29 @@ public class GrysRxTest {
 		
 		// or:
 		toTest.getElementsRx().forEach(System.out::println);
+		
+	}
+	
+	@Test
+	public void testZip() {
+		Observable<Integer> numbers = Observable.just(100, 200, 300, 400, 500);
+		Observable<String> words = Observable.from(Arrays.asList("Hello", "this", "is", "some", "more", "test"));
+		
+		numbers.zipWith(words, (n, w) -> String.format("Zipped: %d : %s", n, w))
+			.subscribe(System.out::println);
+		
+	}
+	
+	@Test
+	public void testSwitch() {
+		Observable<Integer> numbers = Observable.just(100, 200, 300, 400, 500);
+		Observable<String> words = Observable.just("Hello", "this", "is", "some", "text");
+		Observable<String> moreWords = Observable.just("and", "here", "is", "even", "more", "words");
+		
+		Observable<Observable<String>> obsObs = Observable.just(words, moreWords);
+		
+		Observable.switchOnNext(obsObs)
+			.subscribe(System.out::println);
 		
 	}
 	
