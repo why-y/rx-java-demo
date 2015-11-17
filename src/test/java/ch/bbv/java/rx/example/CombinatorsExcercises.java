@@ -37,12 +37,7 @@ public class CombinatorsExcercises extends RxTest{
 
         // TODO: Use observable operators to return only the terms where the length is greater than 7
         // HINT: http://reactivex.io/documentation/operators/filter.html
-
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<String> observable = Observable.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
-		Observable<String> observable = subject.filter(s -> s.length()>7);
-		////////////////////////////////////////////////////////////////////////
+		Observable<String> observable = Observable.empty();
 		
 		// verify:
 		observable.subscribe(observer);
@@ -77,11 +72,8 @@ public class CombinatorsExcercises extends RxTest{
 		
 		// TODO: Write the expected values with the correct order into the next statement
         // HINT: http://reactivex.io/documentation/operators/merge.html	
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		List<String> expected = Arrays.asList("??");
-		//////////////////// RESOLVED //////////////////////////////////////////
-		List<String> expected = Arrays.asList("A", "X", "Y", "B", "Z", "C");
-		////////////////////////////////////////////////////////////////////////
+		List<String> expected = Arrays.asList("??");
+		
 		assertEquals(expected, result);
 		
     }
@@ -115,11 +107,8 @@ public class CombinatorsExcercises extends RxTest{
 		
 		// TODO: Write the expected values with the correct order into the next statement
         // HINT: http://reactivex.io/documentation/operators/merge.html	
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		List<String> expected = Arrays.asList("??");
-		//////////////////// RESOLVED //////////////////////////////////////////
-		List<String> expected = Arrays.asList("A", "B", "C", "X", "Y", "Z");
-		////////////////////////////////////////////////////////////////////////
+		List<String> expected = Arrays.asList("??");
+
 		assertEquals(expected, result);
 		
 	}
@@ -133,14 +122,10 @@ public class CombinatorsExcercises extends RxTest{
 		// TODO: ignore input elements preceeding another in less than or equal 100 ticks
 		// HINT 1: http://reactivex.io/documentation/operators/debounce.html
 		
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<Integer> testObservable = input.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
-		Observable<Integer> observable = input.debounce(110, TimeUnit.MILLISECONDS, testScheduler);
-		////////////////////////////////////////////////////////////////////////
+		Observable<Integer> testObservable = input.empty();
 
 		List<Integer> result = new ArrayList<>();
-		observable.subscribe(result::add);
+		testObservable.subscribe(result::add);
 		
 		// start test sequence
 		input.onNext(1);
@@ -166,12 +151,7 @@ public class CombinatorsExcercises extends RxTest{
         // changed relatively to the previous one.
         // TODO: only return changed temperature values (includes the first, new one)
         // HINT: http://reactivex.io/documentation/operators/distinct.html (almost)
-		
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<Integer> observable = Observable.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
-		Observable<Integer> observable = Observable.from(input).distinctUntilChanged();
-		////////////////////////////////////////////////////////////////////////
+		Observable<Integer> observable = Observable.empty();
 		
 
 		// verify
@@ -196,12 +176,7 @@ public class CombinatorsExcercises extends RxTest{
         // TODO: Split the tourists into suitable batches
         // HINT 1: http://reactivex.io/documentation/operators/buffer.html (suitable overload)
         // HINT 2: filtering
-		
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<List<String>> observable = input.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
-		Observable<List<String>> observable = input.buffer(120, TimeUnit.MILLISECONDS, 2, testScheduler).filter(l -> !l.isEmpty());
-		////////////////////////////////////////////////////////////////////////
+		Observable<List<String>> observable = input.empty();
 		
 		// verify
 		List<List<String>> result = new ArrayList<>();
@@ -246,13 +221,7 @@ public class CombinatorsExcercises extends RxTest{
         // HINT: use a suitable overload of the same method used in "Batching"
         // and then calculate the average of each batch using LINQ
         // HINT: don't forget to pass the scheduler
-
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<Double> movingAverage = Observable.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
-		Observable<Double> movingAverage = temparaturSequence.buffer(3,1)
-				.map(seq -> new Double(seq.stream().mapToInt(Integer::intValue).average().getAsDouble()));
-		////////////////////////////////////////////////////////////////////////
+		Observable<Double> movingAverage = Observable.empty();
 
 		// verify
 		TestSubscriber<Double> testSubscriber = new TestSubscriber<>();
@@ -306,21 +275,16 @@ public class CombinatorsExcercises extends RxTest{
 				.take(3)
 				.map(i -> topicObservables.get(i.intValue()));
 		
-//		 t[ms]:   0        100       200       300
-//		topics:   A---------B---------C---------| 
-//		     A:   1-------2-|-----3---|---------|
-//		     B:   |---------|----1----|2-----3--|
-//		     C:   |---------|---------1---2---3-|
-//		Result:  A-1     A-2    B-1  C-1 C-2 C-3
+		//		 t[ms]:   0        100       200       300
+		//		topics:   A---------B---------C---------| 
+		//		     A:   1-------2-|-----3---|---------|
+		//		     B:   |---------|----1----|2-----3--|
+		//		     C:   |---------|---------1---2---3-|
+		//		Result:  A-1     A-2    B-1  C-1 C-2 C-3
 				
 		// TODO: always switch to the latest topic
 		// HINT: http://reactivex.io/documentation/operators/switch.html
-		
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<String> latestInteresting = Observable.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
-		Observable<String> latestInteresting = Observable.switchOnNext(topics);
-		////////////////////////////////////////////////////////////////////////
+		Observable<String> latestInteresting = Observable.empty();
 
 		// verify
 		TestSubscriber<String> testSubscriber = new TestSubscriber<>();

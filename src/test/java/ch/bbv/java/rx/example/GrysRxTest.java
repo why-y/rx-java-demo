@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import rx.Observable;
@@ -32,6 +33,7 @@ import rx.schedulers.Schedulers;
  * @author yvesgross
  *
  */
+@Ignore
 public class GrysRxTest {
 	
 	static private class Store {

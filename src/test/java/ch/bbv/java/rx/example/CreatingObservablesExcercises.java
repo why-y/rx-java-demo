@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -27,11 +26,7 @@ public class CreatingObservablesExcercises extends RxTest {
 //        Random random = new Random(7);
 
         // TODO: Create an infinite observable generating integers at random times but at least every 100 ticks
-        //////////////////// UNRESOVED /////////////////////////////////////////
-//        Observable<Long> observable = Observable.never();
-        //////////////////// RESOLVED //////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
-        
+        Observable<Long> observable = Observable.never();
 
         
         // check it
@@ -52,11 +47,7 @@ public class CreatingObservablesExcercises extends RxTest {
 		
 		// TODO: Create an observable emitting numbers starting from 0...
 		//       every 150ms, but only for one second (i.e. ends with 5).
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<Losng> observable = Observable.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
-		Observable<Long> observable = Observable.interval(150, TimeUnit.MILLISECONDS).take(1, TimeUnit.SECONDS);
-		////////////////////////////////////////////////////////////////////////
+		Observable<Long> observable = Observable.empty();
 		observable.toBlocking().toIterable().forEach(result::add);
 		
 		// verify
@@ -80,15 +71,6 @@ public class CreatingObservablesExcercises extends RxTest {
         subject.subscribe(testObserver);
         
         //// TODO: send some notifications
-		//////////////////// UNRESOVED /////////////////////////////////////////
-		//////////////////// RESOLVED //////////////////////////////////////////
-        subject.onNext(34);
-        subject.onNext(29);
-        subject.onNext(93);
-        subject.onNext(45);
-        subject.onNext(13);
-        subject.onCompleted();
-		////////////////////////////////////////////////////////////////////////
 
 		// check it
         assertTrue("Error Event received!", testObserver.getOnErrorEvents().isEmpty());

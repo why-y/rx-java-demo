@@ -15,6 +15,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.bbv.java.rx.example.model.Employee;
@@ -28,6 +29,7 @@ import rx.schedulers.TestScheduler;
  * @author yvesgross
  *
  */
+@Ignore
 public class ModelServiceTest {
 	
     private static final Logger logger = Logger.getLogger(ModelServiceTest.class.getName());

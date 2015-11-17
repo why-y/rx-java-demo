@@ -30,18 +30,11 @@ public class BasicsTest extends RxTest {
 	public void exerciseObservableAndObserver() {
 		
 		// TODO: create an 'Observable' that 'return's an integer
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<Integer> observable = Observable.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
-		Observable<Integer> observable = Observable.just(new Integer(42));
-		////////////////////////////////////////////////////////////////////////
+		Observable<Integer> observable = Observable.empty();
 		
 		TestObserver<Integer> observer = new TestObserver<>();
+		
 		//// TODO: subscribe to the observable
-		//////////////////// UNRESOVED /////////////////////////////////////////
-		//////////////////// RESOLVED //////////////////////////////////////////
-		observable.subscribe(observer);
-		////////////////////////////////////////////////////////////////////////
 
 		// check it
 		observer.assertReceivedOnNext(Arrays.asList(42));
@@ -58,13 +51,7 @@ public class BasicsTest extends RxTest {
         // Instead of having an observer, we can also supply
         // a method to be called when something happens.
         // TODO extend the subscription
-    	//////////////////// UNRESOVED /////////////////////////////////////////
-//        observable.subscribe();
-    	//////////////////// RESOLVED //////////////////////////////////////////
-        observable.subscribe(
-        		s -> log(s),
-        		e -> errorHappened.setValue(true));
-    	////////////////////////////////////////////////////////////////////////
+        observable.subscribe();
         
         // check it
         assertTrue(errorHappened.getValue().booleanValue());
@@ -80,11 +67,7 @@ public class BasicsTest extends RxTest {
 		List<String> collection = Arrays.asList("Hello", "world");
 
         // TODO: create an observable from the collection
-    	//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<String> observable = Observable.empty();
-    	//////////////////// RESOLVED //////////////////////////////////////////
-		Observable<String> observable = Observable.from(collection);
-    	////////////////////////////////////////////////////////////////////////
+		Observable<String> observable = Observable.empty();
 
 		// verify
 		TestSubscriber<String> testObserver = new TestSubscriber<>();
@@ -102,12 +85,8 @@ public class BasicsTest extends RxTest {
         // them on to non-reactive APIs.
 		Observable<String> observable = Observable.just("FooBar").repeat(3);
 
-        //// TODO: create a collection from the observable
+        // TODO: create a collection from the observable
 		Collection<String> collection = new ArrayList<>();
-		//////////////////// UNRESOVED /////////////////////////////////////////
-		//////////////////// RESOLVED //////////////////////////////////////////
-		observable.toBlocking().toIterable().forEach(collection::add);
-		////////////////////////////////////////////////////////////////////////
 
 		// verify
 		assertTrue(collection.equals(Arrays.asList("FooBar","FooBar","FooBar")));
