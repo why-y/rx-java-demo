@@ -17,13 +17,12 @@ import org.junit.Test;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
-import rx.schedulers.TestScheduler;
 
 /**
  * @author yvesgross
  *
  */
-public class MiscTest {
+public class MiscTest extends RxTest {
 	
 	@Test
 	public void exerciseObservablesAreCollectionlike() {
@@ -52,14 +51,14 @@ public class MiscTest {
 		observable = observable.last();
 		////////////////////////////////////////////////////////////////////////
 		
-		// checkit
+		// check it
 		TestSubscriber<Double> subscriber = new TestSubscriber<>();
 		observable.subscribe(subscriber);
 
 		subscriber.assertCompleted();
 		subscriber.assertNoErrors();
 		
-		System.out.println(String.format("Result: %s", subscriber.getOnNextEvents()));
+		log(String.format("Result: %s", subscriber.getOnNextEvents()));
 		
 		subscriber.assertValueCount(1);
 		
@@ -86,10 +85,10 @@ public class MiscTest {
 		//////////////////// UNRESOVED /////////////////////////////////////////
 //        observable = observable;
 		//////////////////// RESOLVED //////////////////////////////////////////
-        observable = observable.observeOn(Schedulers.computation());
+        observable = observable.observeOn(Schedulers.newThread());
 		////////////////////////////////////////////////////////////////////////
         
-        // checkit
+        // check it
         
         observable.subscribe(val -> threads.put(OBSERVER, new Long(Thread.currentThread().getId())));
 
@@ -99,7 +98,7 @@ public class MiscTest {
 			e1.printStackTrace();
 		}
         
-        System.out.println(String.format("ObservableThreadId: %d   ObserverThreadId: %d", threads.get(OBSERVABLE), threads.get(OBSERVER)));
+        log(String.format("ObservableThreadId: %d   ObserverThreadId: %d", threads.get(OBSERVABLE), threads.get(OBSERVER)));
         assertNotEquals(threads.get(OBSERVABLE), threads.get(OBSERVER));
         
     }
@@ -118,19 +117,18 @@ public class MiscTest {
 		
 		final Map<Month, String> presents = new HashMap<>();
 		
-		// Concurrency is only introduced using schedulers. All methods needing an IScheduler also have
+		// Concurrency is only introduced using schedulers. All methods needing a Scheduler also have
 		// overrides using the default scheduler. For testing, we need to provide a custom one.
 		// TODO: pass 'scheduler' at the right place
 		
 		//////////////////// UNRESOVED /////////////////////////////////////////
 		//////////////////// RESOLVED //////////////////////////////////////////
-		TestScheduler scheduler = new TestScheduler();
 		////////////////////////////////////////////////////////////////////////
 		
-		Observable.interval(1, TimeUnit.SECONDS, scheduler)
+		Observable.interval(1, TimeUnit.SECONDS)
 			.map(i -> Month.of(i.intValue()+1))
-			.limit(12)
-			.doOnNext(m -> System.out.println(m.toString()))
+			.limit(12) // 12 months
+			.doOnNext(m -> log(m.toString()))
 //			.observeOn(Schedulers.io())
 			.subscribe(m -> {
 				if (m.equals(birthDay.getMonth())){
@@ -144,14 +142,14 @@ public class MiscTest {
 		
 		
 		// check it
+		Map<Month, String> expectedPresens = new HashMap<>();
 		
 		// wait for completion ...
-		scheduler.advanceTimeBy(8, TimeUnit.SECONDS);
-		Map<Month, String> expectedPresens = new HashMap<>();
-		expectedPresens.put(Month.JUNE, "Breakfast at tiffany's");
-		assertEquals(expectedPresens, presents);
-		
-		scheduler.advanceTimeBy(4, TimeUnit.SECONDS);
+//		scheduler.advanceTimeBy(8, TimeUnit.SECONDS);
+//		expectedPresens.put(Month.JUNE, "Breakfast at tiffany's");
+//		assertEquals(expectedPresens, presents);
+//		
+//		scheduler.advanceTimeBy(4, TimeUnit.SECONDS);
 		
 		// .. takes forever
 //		try {
@@ -161,7 +159,7 @@ public class MiscTest {
 //			e.printStackTrace();
 //		}
 		
-		System.out.println(presents);
+		log(presents);
 		expectedPresens = new HashMap<>();
 		expectedPresens.put(Month.JUNE, "Breakfast at tiffany's");
 		expectedPresens.put(Month.OCTOBER, "New Bike");

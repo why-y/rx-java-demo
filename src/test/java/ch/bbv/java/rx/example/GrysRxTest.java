@@ -3,6 +3,8 @@
  */
 package ch.bbv.java.rx.example;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -12,22 +14,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.print.attribute.standard.PrinterLocation;
-
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import rx.Observable;
 import rx.Observer;
-import rx.Subscription;
+import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 
 /**
@@ -35,6 +33,35 @@ import rx.schedulers.Schedulers;
  *
  */
 public class GrysRxTest {
+	
+	static private class Store {
+		public int counter=0;
+	}
+	
+	private class Pair<X, Y> {
+		
+		private X first;
+		private Y second;
+
+		public Pair(X first, Y second) {
+			this.first = first;
+			this.second = second;
+		}
+
+		public X first() {
+			return this.first;
+		}
+
+		public Y second() {
+			return this.second;
+		}
+
+		@Override
+		public String toString() {
+			return "Pair [x=" + first + ", y=" + second + "]";
+		}
+
+	}
 	
     private static final Logger logger = Logger.getLogger(GrysRxTest.class.getName());
     private static final SimpleDateFormat SDF = new SimpleDateFormat("mm:ss.SSS");
@@ -44,30 +71,9 @@ public class GrysRxTest {
 	/**
 	 * @throws java.lang.Exception
 	 */
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@Before
 	public void setUp() throws Exception {
 		toTest = new SimpleRx();
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	@Test
@@ -111,7 +117,7 @@ public class GrysRxTest {
 	@Test
 	public void testReadSlowDataSource() throws IOException {
 		final long start = System.currentTimeMillis();		
-		Subscription subscription = toTest.getElementsRxSlow().subscribeOn(Schedulers.io()).subscribe(
+		toTest.getElementsRxSlow().subscribeOn(Schedulers.io()).subscribe(
 				s -> {
 					System.out.println(String.format("String: \"%s\" emmitted at %s", s, SDF.format(new Date())));
 				},
@@ -131,7 +137,6 @@ public class GrysRxTest {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 //		subscription.unsubscribe();
@@ -140,25 +145,6 @@ public class GrysRxTest {
 		System.out.println(String.format("TERMINATED"));
 	}
 	
-	
-	@Test
-	public void dummyTest() {
-		
-		Observable.just("Some Text").subscribe(
-				s -> System.out.println("onNext() returned: " + s),
-				e -> System.out.println("Exception: " + e),
-				() -> System.out.println("Completed"));
-				
-		Observable<Integer> oIntArr1 = Observable.from(Arrays.asList(1,2,3,4,5,8));
-		Observable<Integer> oIntArr2 = Observable.from(Arrays.asList(55, 66, 77));
-				
-		oIntArr1
-			.map(i -> i*10)
-			.mergeWith(oIntArr2)
-			.forEach(System.out::println);
-		
-	}
-		
 	/**
 	 * Test method for {@link ch.bbv.java.rx.example.SimpleRx#getElements()}.
 	 */
@@ -212,7 +198,6 @@ public class GrysRxTest {
 	
 	@Test
 	public void testSwitch() {
-		Observable<Integer> numbers = Observable.just(100, 200, 300, 400, 500);
 		Observable<String> words = Observable.just("Hello", "this", "is", "some", "text");
 		Observable<String> moreWords = Observable.just("and", "here", "is", "even", "more", "words");
 		
@@ -247,4 +232,77 @@ public class GrysRxTest {
 		System.out.println(String.format("--/ testGetABC()  duration: %s(%d)", SDF.format(new Date(duration)), duration));
 	}
 
+	@Test
+	public void testFlatMap() {
+		TestSubscriber<Integer> tester = new TestSubscriber<>();
+		Observable.range(1, 4)
+			.map(i -> i*100)
+			.flatMap(i -> Observable.range(i, 3))
+			.subscribe(tester);
+		tester.assertCompleted();
+		tester.assertNoErrors();
+		tester.assertReceivedOnNext(Arrays.asList(100, 101, 102, 200, 201, 202, 300, 301, 302, 400, 401, 402));
+	}
+	
+	@Test 
+	public void testSideEffects() {
+		TestSubscriber<String> tester = new TestSubscriber<>();
+		Observable<String> wordsStream = Observable.just("It", "is", "important", "to", "avoid", "side", "effects");
+		
+		Store store = new Store();
+		
+		Observable<String> letterCounts = wordsStream.map(word -> {
+			store.counter += word.length();
+			return String.format("%s(%d)", word, word.length());
+		});
+		
+		letterCounts.subscribe(tester);
+		checkLetterCounter(tester, store);
+		
+		TestSubscriber<String> tester2 = new TestSubscriber<>();
+		letterCounts.subscribe(tester2);
+		checkLetterCounter(tester2, store);
+	}
+	
+	@Test 
+	public void testAvoidSideEffects() {
+		TestSubscriber<Pair<String, Integer>> tester = new TestSubscriber<>();
+		Observable<String> wordsStream = Observable.just("It", "is", "important", "to", "avoid", "side", "effects");
+		Observable<Pair<String, Integer>> letterCounts = wordsStream
+				.scan(new Pair<>("", 0), (prev, word) -> new Pair<>(word, word.length()+prev.second))
+				.skip(1) // skip the initial value
+				.doOnNext(System.out::println);
+		
+		letterCounts.subscribe(tester);
+		checkLetterCounter(tester);
+		
+		TestSubscriber<Pair<String, Integer>> tester2 = new TestSubscriber<>();
+		letterCounts.subscribe(tester2);
+		checkLetterCounter(tester2);
+	}
+	
+	@Test 
+	public void testAvoidSideEffects1() {
+		Observable<String> wordsStream = Observable.just("It", "is", "important", "to", "avoid", "side", "effects");
+		
+		wordsStream
+			.reduce(0, (prev, word) -> prev+word.length()).last()
+			.subscribe(System.out::println);
+	}
+	
+	private void checkLetterCounter(final TestSubscriber<Pair<String, Integer>> subscriber) {
+		subscriber.assertCompleted();
+		subscriber.assertNoErrors();
+		List<Pair<String, Integer>> result = subscriber.getOnNextEvents();
+		System.out.println(result);
+		assertEquals(31, result.get(result.size()-1).second().intValue());		
+	}
+	
+	private void checkLetterCounter(final TestSubscriber<String> subscriber, Store store) {
+		subscriber.assertCompleted();
+		subscriber.assertNoErrors();
+		System.out.println(subscriber.getOnNextEvents());
+		assertEquals(31, store.counter);
+	}
 }
+

@@ -22,7 +22,7 @@ import rx.subjects.Subject;
 public class SimpleRx {
 	
 //	private static final Long DURATION = 1000L;
-	private static final Duration TIMEOUT = Duration.ofSeconds(1);
+	private static final Duration TIMEOUT = Duration.ofMillis(100);
 
 	private static final Collection<String> DATA = Arrays.asList((new StringBuilder())
 			.append("In computing, reactive programming is a programming paradigm oriented ")

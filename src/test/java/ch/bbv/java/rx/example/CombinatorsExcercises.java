@@ -12,15 +12,13 @@ import org.junit.Test;
 import rx.Observable;
 import rx.observers.TestObserver;
 import rx.observers.TestSubscriber;
-import rx.schedulers.Schedulers;
-import rx.schedulers.TestScheduler;
 import rx.subjects.PublishSubject;
 
 /**
  * @author yvesgross
  *
  */
-public class CombinatorsExcercises {
+public class CombinatorsExcercises extends RxTest{
 
 	@Test
     public void exerciseFiltering()
@@ -54,8 +52,6 @@ public class CombinatorsExcercises {
 	@Test
     public void exerciseMerging()
     {
-		TestScheduler testScheduler = Schedulers.test();
-		
 		List<String> valuesA = Arrays.asList("A", "B", "C");
 		List<String> valuesB = Arrays.asList("X", "Y", "Z");
 
@@ -92,8 +88,6 @@ public class CombinatorsExcercises {
 
 	@Test
 	public void exerciseConcatenate() {
-
-		TestScheduler testScheduler = Schedulers.test();
 
 		List<String> valuesA = Arrays.asList("A", "B", "C");
 		List<String> valuesB = Arrays.asList("X", "Y", "Z");
@@ -133,7 +127,6 @@ public class CombinatorsExcercises {
 
 	@Test
 	public void exerciseDebounce() {
-		TestScheduler testScheduler = Schedulers.test();
 		
 		PublishSubject<Integer> input = PublishSubject.create();
 		
@@ -183,18 +176,17 @@ public class CombinatorsExcercises {
 
 		// verify
 		List<Integer> expected = Arrays.asList(20, 21, 22, 21, 24, 23);
-		TestObserver<Integer> testObserver = new TestObserver<>();
-		observable.subscribe(testObserver);
-		testObserver.getOnErrorEvents().isEmpty();
-		testObserver.assertTerminalEvent();
-		testObserver.assertReceivedOnNext(expected);
+		TestSubscriber<Integer> tester = new TestSubscriber<>();
+		observable.subscribe(tester);
+		tester.assertCompleted();
+		tester.assertNoErrors();
+		tester.assertReceivedOnNext(expected);
 		
 	}
 		
 	@Test
 	public void exerciseBatching() {
 		
-		TestScheduler testScheduler = Schedulers.test();
 		PublishSubject<String> input = PublishSubject.create();
 		
         // - The cable car leaves: 
@@ -242,7 +234,6 @@ public class CombinatorsExcercises {
 	public void exerciseMovingAverage() {
 
 		
-		TestScheduler testScheduler = Schedulers.test();
 		// 24 measuring points, one for each hour of the day: 
 		List<Integer> temparaturArray = Arrays.asList(8, 7, 6, 6, 7, 7, 8, 10, 13, 16, 10, 20, 23, 26, 30, 29, 27, 45, 24, 23, 20, 18, 15, 11);
 		Observable<Integer> temparaturSequence = Observable
@@ -270,7 +261,7 @@ public class CombinatorsExcercises {
 		// let the time elapse until completion
 		testScheduler.advanceTimeBy(1, TimeUnit.DAYS);
 		
-		System.out.println(testSubscriber.getOnNextEvents());
+		log(testSubscriber.getOnNextEvents());
 		
 		testSubscriber.assertNoErrors();
 		testSubscriber.assertCompleted();
@@ -291,8 +282,6 @@ public class CombinatorsExcercises {
 	
 	@Test
 	public void exerciseInterruptible() {
-
-		TestScheduler testScheduler = Schedulers.test();
 
 		// For a news site offering articles about trending topics we want to keep reading about
         // a topic until a new trend appears, when we want to hear about the latest news there.
@@ -336,7 +325,7 @@ public class CombinatorsExcercises {
 		// verify
 		TestSubscriber<String> testSubscriber = new TestSubscriber<>();
 		latestInteresting
-			.doOnNext(article -> System.out.println(String.format("    doOnNext(): %s  Time: %d", article, testScheduler.now())))
+			.doOnNext(article -> log(String.format("    doOnNext(): %s  Time: %d", article, testScheduler.now())))
 			.subscribe(testSubscriber);
 		
 		// let the time elapse until completion

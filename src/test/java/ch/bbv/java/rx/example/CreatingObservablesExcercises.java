@@ -14,36 +14,35 @@ import rx.Observable;
 import rx.observers.TestObserver;
 import rx.subjects.BehaviorSubject;
 
-/**
- * @author yvesgross
- *
- */
-public class CreatingObservablesExcercises {
+public class CreatingObservablesExcercises extends RxTest {
 	
 	
 	@Test
 	public void exercise_UsingFactoryMethod() {
 		
-		//////////////////// UNRESOVED /////////////////////////////////////////
-		//////////////////// RESOLVED //////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-
 		
         // The preferred way of creating production observables is through combinators
         // (i.e. Return, Never, Interval, ...). In tests predefined sequences are predominant.
         // For more complex scenarios there is Observable.create(...)
-//        TestScheduler scheduler = new TestScheduler();
-//        var random = new Random(7);
+//        Random random = new Random(7);
 
         // TODO: Create an infinite observable generating integers at random times but at least every 100 ticks
+        //////////////////// UNRESOVED /////////////////////////////////////////
 //        Observable<Long> observable = Observable.never();
+        //////////////////// RESOLVED //////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        
+
+        
+        // check it
 
         // Extremely poor mans randomness test, for better variants see Knuth's TAOCP
 //        var result = scheduler.Start(() => observable, 1000);
 //        var timings = result.Messages.Select(m => m.Time).Distinct();
 //        timings.Count().Should().BeGreaterThan(1);
 		
-        // checkit
+		
+        
 	}
 
 	@Test
@@ -91,7 +90,7 @@ public class CreatingObservablesExcercises {
         subject.onCompleted();
 		////////////////////////////////////////////////////////////////////////
 
-		// checkit
+		// check it
         assertTrue("Error Event received!", testObserver.getOnErrorEvents().isEmpty());
         assertTrue("No Completed Event received!", testObserver.getOnCompletedEvents().size()==1);
         testObserver.assertReceivedOnNext(Arrays.asList(34, 29, 93, 45, 13));

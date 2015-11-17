@@ -6,42 +6,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import rx.Observable;
 import rx.observers.TestObserver;
+import rx.observers.TestSubscriber;
+import rx.schedulers.TestScheduler;
 import rx.subjects.PublishSubject;
 
-/**
- * @author yvesgross
- *
- */
-public class BasicsTest {
+// HOW TO USE THIS WORKSHOP
+// Goal: make all test pass by just implementing the missing parts indicated with TODOs
+// The code you should change or add is always right below the TODOs.
+// Try starting at the TODOs and only then read the rest of code. Normally it's not needed
+// to know the details of the test arrangement before you know the task (sometimes even not at all).
+// Try solving first without looking at the test output. Debugging should not be needed.
+// -
+
+public class BasicsTest extends RxTest {
 	
-	private static boolean errorHappened = false;
-	
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-		errorHappened=false;
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
-
 	@Test
 	public void exerciseObservableAndObserver() {
 		
@@ -59,7 +43,7 @@ public class BasicsTest {
 		observable.subscribe(observer);
 		////////////////////////////////////////////////////////////////////////
 
-		// checkit
+		// check it
 		observer.assertReceivedOnNext(Arrays.asList(42));
 		observer.assertTerminalEvent();
 		
@@ -69,6 +53,7 @@ public class BasicsTest {
 	@Test
 	public void exerciseObsertvableAndAction() {
 		Observable<Double> observable = Observable.create(subscriber -> subscriber.onError(new Exception()));
+		final Value<Boolean> errorHappened = new Value<>(false);
 
         // Instead of having an observer, we can also supply
         // a method to be called when something happens.
@@ -77,12 +62,12 @@ public class BasicsTest {
 //        observable.subscribe();
     	//////////////////// RESOLVED //////////////////////////////////////////
         observable.subscribe(
-        		s -> System.out.println(s),
-        		e -> errorHappened = true);
+        		s -> log(s),
+        		e -> errorHappened.setValue(true));
     	////////////////////////////////////////////////////////////////////////
         
-        // checkit
-        assertTrue(errorHappened);
+        // check it
+        assertTrue(errorHappened.getValue().booleanValue());
     }
 	
 	@Test
@@ -102,10 +87,11 @@ public class BasicsTest {
     	////////////////////////////////////////////////////////////////////////
 
 		// verify
-		TestObserver<String> testObserver = new TestObserver<>();
+		TestSubscriber<String> testObserver = new TestSubscriber<>();
 		observable.subscribe(testObserver);
+		testObserver.assertCompleted();
+		testObserver.assertNoErrors();
 		testObserver.assertReceivedOnNext(collection);
-		testObserver.assertTerminalEvent();
     }
 	
 	@Test
@@ -141,6 +127,7 @@ public class BasicsTest {
 		observable.onNext(5000L); 
 		observable.onNext(6000L);
 		observable.onNext(7000L);
+		observable.onCompleted();
 
 		testObserver.assertReceivedOnNext(testData);
 		assertTrue(testObserver.getOnNextEvents().equals(testData));
@@ -149,4 +136,45 @@ public class BasicsTest {
 
     }
 	
+	@Test
+	public void noteColdObservables() {
+		
+		Observable<Long> observable = Observable.interval(1, TimeUnit.SECONDS, testScheduler);
+		
+		// first subscription:
+		observable.take(6).subscribe(l -> log(String.format("Subscription A recieved %d", l)));
+		
+		testScheduler.advanceTimeBy(2001, TimeUnit.MILLISECONDS);
+		
+		// second subscription:
+		observable.take(3).subscribe(l -> log(String.format("      Subscription B recieved %d", l)));
+		
+		testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+
+	}
+
+	@Test
+	public void noteHotObservables() {
+		
+		TestScheduler scheduler = new TestScheduler();
+		PublishSubject<Long> observable = PublishSubject.create();
+		observable.observeOn(scheduler);
+		
+		// first subscription:
+		observable.take(6).subscribe(l -> log(String.format("Subscription A recieved %d", l)));
+		
+		// emitting plan
+		for (long i=1; i<=20; ++i) {
+			// Hot Observable: we can emit signals, no matter whether
+			// there are subscriptions or not.
+			observable.onNext(i);
+			scheduler.advanceTimeBy( 1, TimeUnit.SECONDS);
+			if(i==2) {
+				// second subscription after two seconds:
+				observable.take(3).subscribe(l -> log(String.format("      Subscription B recieved %d", l)));				
+			}
+		}
+		observable.onCompleted();
+		
+	}
 }
