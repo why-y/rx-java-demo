@@ -8,26 +8,24 @@ import static org.junit.Assert.assertTrue;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.bbv.java.rx.example.model.Employee;
 import ch.bbv.java.rx.example.model.Employee.Skill;
-import rx.Observable;
-import rx.Scheduler.Worker;
 import rx.observers.TestObserver;
-import rx.schedulers.TestScheduler;
 
 /**
  * @author yvesgross
  *
  */
+@Ignore
 public class ModelServiceTest {
 	
     private static final Logger logger = Logger.getLogger(ModelServiceTest.class.getName());
@@ -65,6 +63,7 @@ public class ModelServiceTest {
 	}
 	
 	@Test
+	@Ignore
 	public void testGetAll() {
 		
 		// Classic
@@ -81,6 +80,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
+	@Ignore
 	public void testGet() {
 
 		int index = 2;
@@ -100,6 +100,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
+	@Ignore
 	public void testGetJavaEmloyees() {
 		
 		// Classic

@@ -38,18 +38,10 @@ public class MiscTest extends RxTest {
 		Observable<Double> observable = Observable.from(halfUnitCircle);
 		
 		// TODO: write an observable filtering for x where Math.Cos(x) > 0
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		observable = observable;
-		//////////////////// RESOLVED //////////////////////////////////////////
 		observable = observable.filter(d -> Math.cos(d) > 0);
-		////////////////////////////////////////////////////////////////////////
 		
 		// TODO: get the last value
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		observable = observable;
-		//////////////////// RESOLVED //////////////////////////////////////////
 		observable = observable.last();
-		////////////////////////////////////////////////////////////////////////
 		
 		// check it
 		TestSubscriber<Double> subscriber = new TestSubscriber<>();
@@ -82,11 +74,7 @@ public class MiscTest extends RxTest {
 
         // TODO: find a way to schedule observations on a different thread
         // HINT: might also be done using an overload when creating the observable
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//        observable = observable;
-		//////////////////// RESOLVED //////////////////////////////////////////
         observable = observable.observeOn(Schedulers.newThread());
-		////////////////////////////////////////////////////////////////////////
         
         // check it
         
@@ -121,11 +109,7 @@ public class MiscTest extends RxTest {
 		// overrides using the default scheduler. For testing, we need to provide a custom one.
 		// TODO: pass 'scheduler' at the right place
 		
-		//////////////////// UNRESOVED /////////////////////////////////////////
-		//////////////////// RESOLVED //////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-		
-		Observable.interval(1, TimeUnit.SECONDS)
+		Observable.interval(1, TimeUnit.SECONDS, testScheduler)
 			.map(i -> Month.of(i.intValue()+1))
 			.limit(12) // 12 months
 			.doOnNext(m -> log(m.toString()))
@@ -145,11 +129,11 @@ public class MiscTest extends RxTest {
 		Map<Month, String> expectedPresens = new HashMap<>();
 		
 		// wait for completion ...
-//		scheduler.advanceTimeBy(8, TimeUnit.SECONDS);
-//		expectedPresens.put(Month.JUNE, "Breakfast at tiffany's");
-//		assertEquals(expectedPresens, presents);
-//		
-//		scheduler.advanceTimeBy(4, TimeUnit.SECONDS);
+		testScheduler.advanceTimeBy(8, TimeUnit.SECONDS);
+		expectedPresens.put(Month.JUNE, "Breakfast at tiffany's");
+		assertEquals(expectedPresens, presents);
+		
+		testScheduler.advanceTimeBy(4, TimeUnit.SECONDS);
 		
 		// .. takes forever
 //		try {

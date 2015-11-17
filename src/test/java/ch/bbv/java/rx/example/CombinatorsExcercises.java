@@ -37,14 +37,9 @@ public class CombinatorsExcercises extends RxTest{
 
         // TODO: Use observable operators to return only the terms where the length is greater than 7
         // HINT: http://reactivex.io/documentation/operators/filter.html
-
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<String> observable = Observable.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
 		Observable<String> observable = subject.filter(s -> s.length()>7);
-		////////////////////////////////////////////////////////////////////////
 		
-		// verify:
+		// check it:
 		observable.subscribe(observer);
 		observer.assertReceivedOnNext(Arrays.asList("constructing", "observables"));
     }
@@ -70,18 +65,15 @@ public class CombinatorsExcercises extends RxTest{
 			.merge(observableA, observableB)
 			.subscribe(result::add);
 				
-		// verify
+		// check it
 
 		// let the time elapse until completion
 		testScheduler.advanceTimeBy(201, TimeUnit.MILLISECONDS);
 		
 		// TODO: Write the expected values with the correct order into the next statement
         // HINT: http://reactivex.io/documentation/operators/merge.html	
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		List<String> expected = Arrays.asList("??");
-		//////////////////// RESOLVED //////////////////////////////////////////
 		List<String> expected = Arrays.asList("A", "X", "Y", "B", "Z", "C");
-		////////////////////////////////////////////////////////////////////////
+
 		assertEquals(expected, result);
 		
     }
@@ -107,7 +99,7 @@ public class CombinatorsExcercises extends RxTest{
 			.concat(observableA, observableB)
 			.subscribe(result::add);
 		
-		// verify
+		// check it
 		
 		// let the time elapse until completion
 		testScheduler.advanceTimeBy(321, TimeUnit.MILLISECONDS);
@@ -115,11 +107,8 @@ public class CombinatorsExcercises extends RxTest{
 		
 		// TODO: Write the expected values with the correct order into the next statement
         // HINT: http://reactivex.io/documentation/operators/merge.html	
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		List<String> expected = Arrays.asList("??");
-		//////////////////// RESOLVED //////////////////////////////////////////
 		List<String> expected = Arrays.asList("A", "B", "C", "X", "Y", "Z");
-		////////////////////////////////////////////////////////////////////////
+
 		assertEquals(expected, result);
 		
 	}
@@ -132,12 +121,7 @@ public class CombinatorsExcercises extends RxTest{
 		
 		// TODO: ignore input elements preceeding another in less than or equal 100 ticks
 		// HINT 1: http://reactivex.io/documentation/operators/debounce.html
-		
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<Integer> testObservable = input.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
 		Observable<Integer> observable = input.debounce(110, TimeUnit.MILLISECONDS, testScheduler);
-		////////////////////////////////////////////////////////////////////////
 
 		List<Integer> result = new ArrayList<>();
 		observable.subscribe(result::add);
@@ -166,15 +150,9 @@ public class CombinatorsExcercises extends RxTest{
         // changed relatively to the previous one.
         // TODO: only return changed temperature values (includes the first, new one)
         // HINT: http://reactivex.io/documentation/operators/distinct.html (almost)
-		
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<Integer> observable = Observable.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
 		Observable<Integer> observable = Observable.from(input).distinctUntilChanged();
-		////////////////////////////////////////////////////////////////////////
-		
 
-		// verify
+		// check it
 		List<Integer> expected = Arrays.asList(20, 21, 22, 21, 24, 23);
 		TestSubscriber<Integer> tester = new TestSubscriber<>();
 		observable.subscribe(tester);
@@ -196,14 +174,9 @@ public class CombinatorsExcercises extends RxTest{
         // TODO: Split the tourists into suitable batches
         // HINT 1: http://reactivex.io/documentation/operators/buffer.html (suitable overload)
         // HINT 2: filtering
-		
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<List<String>> observable = input.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
 		Observable<List<String>> observable = input.buffer(120, TimeUnit.MILLISECONDS, 2, testScheduler).filter(l -> !l.isEmpty());
-		////////////////////////////////////////////////////////////////////////
 		
-		// verify
+		// check it
 		List<List<String>> result = new ArrayList<>();
 		observable.subscribe(result::add);
 		
@@ -246,15 +219,10 @@ public class CombinatorsExcercises extends RxTest{
         // HINT: use a suitable overload of the same method used in "Batching"
         // and then calculate the average of each batch using LINQ
         // HINT: don't forget to pass the scheduler
-
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<Double> movingAverage = Observable.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
 		Observable<Double> movingAverage = temparaturSequence.buffer(3,1)
 				.map(seq -> new Double(seq.stream().mapToInt(Integer::intValue).average().getAsDouble()));
-		////////////////////////////////////////////////////////////////////////
 
-		// verify
+		// check it
 		TestSubscriber<Double> testSubscriber = new TestSubscriber<>();
 		movingAverage.subscribe(testSubscriber);
 
@@ -315,14 +283,9 @@ public class CombinatorsExcercises extends RxTest{
 				
 		// TODO: always switch to the latest topic
 		// HINT: http://reactivex.io/documentation/operators/switch.html
-		
-		//////////////////// UNRESOVED /////////////////////////////////////////
-//		Observable<String> latestInteresting = Observable.empty();
-		//////////////////// RESOLVED //////////////////////////////////////////
 		Observable<String> latestInteresting = Observable.switchOnNext(topics);
-		////////////////////////////////////////////////////////////////////////
 
-		// verify
+		// check it
 		TestSubscriber<String> testSubscriber = new TestSubscriber<>();
 		latestInteresting
 			.doOnNext(article -> log(String.format("    doOnNext(): %s  Time: %d", article, testScheduler.now())))

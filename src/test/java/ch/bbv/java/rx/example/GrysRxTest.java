@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import rx.Observable;
@@ -32,11 +33,8 @@ import rx.schedulers.Schedulers;
  * @author yvesgross
  *
  */
-public class GrysRxTest {
-	
-	static private class Store {
-		public int counter=0;
-	}
+@Ignore
+public class GrysRxTest extends RxTest {
 	
 	private class Pair<X, Y> {
 		
@@ -249,19 +247,19 @@ public class GrysRxTest {
 		TestSubscriber<String> tester = new TestSubscriber<>();
 		Observable<String> wordsStream = Observable.just("It", "is", "important", "to", "avoid", "side", "effects");
 		
-		Store store = new Store();
+		Value<Integer> counter = new Value<>(0);
 		
 		Observable<String> letterCounts = wordsStream.map(word -> {
-			store.counter += word.length();
+			counter.setValue(counter.getValue() + word.length());
 			return String.format("%s(%d)", word, word.length());
 		});
 		
 		letterCounts.subscribe(tester);
-		checkLetterCounter(tester, store);
+		checkLetterCounter(tester, counter.getValue().intValue());
 		
 		TestSubscriber<String> tester2 = new TestSubscriber<>();
 		letterCounts.subscribe(tester2);
-		checkLetterCounter(tester2, store);
+		checkLetterCounter(tester2, counter.getValue()/2);
 	}
 	
 	@Test 
@@ -298,11 +296,11 @@ public class GrysRxTest {
 		assertEquals(31, result.get(result.size()-1).second().intValue());		
 	}
 	
-	private void checkLetterCounter(final TestSubscriber<String> subscriber, Store store) {
+	private void checkLetterCounter(final TestSubscriber<String> subscriber, int letters) {
 		subscriber.assertCompleted();
 		subscriber.assertNoErrors();
 		System.out.println(subscriber.getOnNextEvents());
-		assertEquals(31, store.counter);
+		assertEquals(31, letters);
 	}
 }
 

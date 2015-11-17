@@ -14,7 +14,7 @@ public class Interfacing extends RxTest {
 	@Test
 	public void noteObservablesDoNotSubscribeUnnecessarily() {
 		
-		Observable.create(subscriber -> {
+		Observable<String> observable = Observable.create(subscriber -> {
 			subscriber.onNext("Message A");
 			subscriber.onNext("Message B");
 			subscriber.onNext("Message C");
@@ -22,37 +22,18 @@ public class Interfacing extends RxTest {
 		});
 		
 		TestSubscriber<String> subscriber = new TestSubscriber<>();
-//		observable.subscribe(subscriber);
-		//////////////////// UNRESOVED /////////////////////////////////////////
-		//////////////////// RESOLVED //////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
+		observable.subscribe(subscriber);
 		
-		// checkit
+		// check it
 		subscriber.assertCompleted();
 		subscriber.assertNoErrors();
-		subscriber.assertNoValues();
-		
-	}
-
-	@Test
-	public void exerciseFromTasks() {
-		
-		//////////////////// UNRESOVED /////////////////////////////////////////
-		//////////////////// RESOLVED //////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-		
-		// checkit
 		
 	}
 
 	@Test
 	public void exercise() {
-		
-		//////////////////// UNRESOVED /////////////////////////////////////////
-		//////////////////// RESOLVED //////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-		
-		// checkit
+				
+		// check it
 		
 	}
 
