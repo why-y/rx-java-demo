@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 
@@ -46,7 +47,7 @@ public class BasicsTest extends RxTest {
 	@Test
 	public void exerciseObsertvableAndAction() {
 		Observable<Double> observable = Observable.create(subscriber -> subscriber.onError(new Exception()));
-		final Value<Boolean> errorHappened = new Value<>(false);
+		final AtomicBoolean errorHappened = new AtomicBoolean(false);
 
         // Instead of having an observer, we can also supply
         // a method to be called when something happens.
@@ -54,7 +55,7 @@ public class BasicsTest extends RxTest {
         observable.subscribe();
         
         // check it
-        assertTrue(errorHappened.getValue().booleanValue());
+        assertTrue(errorHappened.get());
     }
 	
 	@Test
