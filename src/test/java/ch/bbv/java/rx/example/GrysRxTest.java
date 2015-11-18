@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -247,19 +248,19 @@ public class GrysRxTest extends RxTest {
 		TestSubscriber<String> tester = new TestSubscriber<>();
 		Observable<String> wordsStream = Observable.just("It", "is", "important", "to", "avoid", "side", "effects");
 		
-		Value<Integer> counter = new Value<>(0);
+		AtomicInteger counter = new AtomicInteger(0);
 		
 		Observable<String> letterCounts = wordsStream.map(word -> {
-			counter.setValue(counter.getValue() + word.length());
+			counter.set(counter.get() + word.length());
 			return String.format("%s(%d)", word, word.length());
 		});
 		
 		letterCounts.subscribe(tester);
-		checkLetterCounter(tester, counter.getValue().intValue());
+		checkLetterCounter(tester, counter.get());
 		
 		TestSubscriber<String> tester2 = new TestSubscriber<>();
 		letterCounts.subscribe(tester2);
-		checkLetterCounter(tester2, counter.getValue()/2);
+		checkLetterCounter(tester2, counter.get()/2);
 	}
 	
 	@Test 
